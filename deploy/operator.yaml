@@ -16,10 +16,10 @@ spec:
       containers:
         - name: redis
           # Replace this with the built image name
-          image: REPLACE_IMAGE
+          image: redis-operator:1.0
           command:
           - redis
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: WATCH_NAMESPACE
               valueFrom:
