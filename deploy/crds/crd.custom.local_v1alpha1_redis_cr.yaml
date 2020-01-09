@@ -4,4 +4,8 @@ metadata:
   name: example-redis
 spec:
   # Add fields here
-  size: 3
+  replicas: 6
+  image: redis:4.0.11
+  redistribimage: redis-trib:1.0
+  storage: 1Gi
+  storageClassName: nfs
