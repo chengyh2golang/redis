@@ -255,7 +255,7 @@ func main() {
 						//语法格式：redis-trib reshard --from a8b3d0f9b12d63dab3b7337d602245d96dd55844
 						// --to f413fb7e6460308b17cdb71442798e1341b56cbc
 						// --slots 10923 --yes --pipeline 20 127.0.0.1:6383
-						reShardCommand := "redis-trib reshard "  + "--from all --to " +
+						reShardCommand := "redis-trib.rb reshard "  + "--from all --to " +
 							reShard.nodeIDReceiving + " --slots " +
 							strconv.Itoa(reShard.slotCountByMasterMgmt) + " --yes "  + reShard.clusterInfoNode + ";\n"
 						addNodeCommand += reShardCommand + "sleep 5;\n"
@@ -329,7 +329,7 @@ func main() {
 						//这是master节点，先将master节点对应的slave节点移除
 						for _,slave := range masterStruct.slaveInfoArr {
 							//移除slave节点
-							execLine := "redis-trib del-node " + rediscluster01IPPort + " " +
+							execLine := "redis-trib.rb del-node " + rediscluster01IPPort + " " +
 								slave.slaveID + ";\n"
 							fmt.Println(execLine)
 							execLine += "sleep 5; \n"
@@ -362,7 +362,7 @@ func main() {
 							reshardToMasterIP,_ := fetchIPByFullName(reshardToMasterName)
 							reshardToMasterID := masterInfoMap[reshardToMasterIP].masterID
 
-							reShardCommand := "redis-trib reshard "  + "--from " + masterStruct.masterID +
+							reShardCommand := "redis-trib.rb reshard "  + "--from " + masterStruct.masterID +
 								" --to " +
 								reshardToMasterID + " --slots " + strconv.Itoa(count) +
 								  " --yes "  + rediscluster01IPPort + ";\n"
@@ -374,7 +374,7 @@ func main() {
 						}
 
 						//移除完master上的slot之后，移除这个master
-						execMasterLine := "redis-trib del-node " + rediscluster01IPPort + " " +
+						execMasterLine := "redis-trib.rb del-node " + rediscluster01IPPort + " " +
 							masterStruct.masterID + ";\n"
 						execMasterLine += "sleep 5; \n"
 
@@ -385,7 +385,7 @@ func main() {
 						//判断这个slave节点是否已经被移除，如果没有，移除它
 						slave := slaveInfoMap[itemIP]
 						if !isElementExistsInArr(slave.slaveID,removedSlaveID) {
-							execLine := "redis-trib del-node " + rediscluster01IPPort + " " +
+							execLine := "redis-trib.rb del-node " + rediscluster01IPPort + " " +
 								slave.slaveID + ";\n"
 
 							execLine += "sleep 5; \n"
@@ -509,10 +509,10 @@ func redisTribAddScript(oldClusterSizeInt,newClusterSizeInt int,
 	result := ""
 	for k,stringItem := range resultSlice {
 		if k % 2 == 0 {
-			result +=  "redis-trib add-node " + stringItem + ";" + "\n"
+			result +=  "redis-trib.rb add-node " + stringItem + ";" + "\n"
 			result += "sleep 5; \n"
 		} else {
-			result +=  "redis-trib add-node --slave " + stringItem + ";" + "\n"
+			result +=  "redis-trib.rb add-node --slave " + stringItem + ";" + "\n"
 			result += "sleep 5; \n"
 		}
 
@@ -525,7 +525,7 @@ func redisTribAddScript(oldClusterSizeInt,newClusterSizeInt int,
 // redis-trib create --replicas 1 172.16.73.157:6379 172.16.73.166:6379 172.16.73.169:6379 172.16.73.157:6379 172.16.73.166:6379 172.16.73.169:6379
 func redisTribCreateScript(clusterSize int,redisClusterName string,ns string) string {
 	var resultSlice []string
-	resultSlice = append(resultSlice,"redis-trib ","create ","--replicas 1 ")
+	resultSlice = append(resultSlice,"redis-trib.rb ","create ","--replicas 1 ")
 
 	for i:=0; i< clusterSize;i++ {
 		itemFullname := redisClusterName + "-" + strconv.Itoa(i) + "." +
@@ -568,7 +568,7 @@ func checkFileExists(path string) (bool, error) {
 func fetchClusterStatus(ip string) string {
 	cmd := exec.Command("/bin/bash",
 		"-c",
-		"redis-trib check " + ip + ":6379",
+		"redis-trib.rb check " + ip + ":6379",
 	)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -584,7 +584,7 @@ func fetchClusterStatus(ip string) string {
 func fetchIDByIP(ip string) string {
 	cmd := exec.Command("/bin/bash",
 		"-c",
-		"redis-trib check " + ip + ":6379" +
+		"redis-trib.rb check " + ip + ":6379" +
 			" | grep " + ip + " | grep -v Check | awk '{print $2}'",
 	)
 	output, err := cmd.CombinedOutput()
