@@ -24,7 +24,7 @@ func NewScaleJob(redisCluser *v1alpha1.Redis,oldClusterSize,newClusterSize,jobNa
 				*metav1.NewControllerRef(redisCluser, schema.GroupVersionKind{
 					Group:   v1alpha1.SchemeGroupVersion.Group,
 					Version: v1alpha1.SchemeGroupVersion.Version,
-					Kind:    "RedisCluster",
+					Kind:    "Redis",
 				}),
 			},
 		},

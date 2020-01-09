@@ -20,7 +20,7 @@ func New(redisCluster *v1alpha1.Redis) *corev1.Service {
 				*metav1.NewControllerRef(redisCluster,schema.GroupVersionKind{
 					Group:v1alpha1.SchemeGroupVersion.Group,
 					Version:v1alpha1.SchemeGroupVersion.Version,
-					Kind:"RedisCluster",
+					Kind:"Redis",
 				}),
 			},
 		},

@@ -18,47 +18,47 @@ const (
 
 var configMapMode = int32(0755)
 
-func New(redisCluster *v1alpha1.Redis) *appsv1.StatefulSet {
+func New(redis *v1alpha1.Redis) *appsv1.StatefulSet {
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Statefulset",
 			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      redisCluster.Name,
-			Namespace: redisCluster.Namespace,
-			Labels:    map[string]string{"crd.custom.local": redisCluster.Name},
+			Name:      redis.Name,
+			Namespace: redis.Namespace,
+			Labels:    map[string]string{"crd.custom.local": redis.Name},
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(redisCluster, schema.GroupVersionKind{
+				*metav1.NewControllerRef(redis, schema.GroupVersionKind{
 					Group:   v1alpha1.SchemeGroupVersion.Group,
 					Version: v1alpha1.SchemeGroupVersion.Version,
-					Kind:    "RedisCluster",
+					Kind:    "Redis",
 				}),
 			},
 		},
 		Spec: appsv1.StatefulSetSpec{
 			//这个service是headless的svc
-			ServiceName: redisCluster.Name,
-			Replicas:    redisCluster.Spec.Replicas,
+			ServiceName: redis.Name,
+			Replicas:    redis.Spec.Replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"crd.custom.local/v1alpha1": redisCluster.Name,
+					"crd.custom.local/v1alpha1": redis.Name,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: redisCluster.Name,
+					Name: redis.Name,
 					Labels: map[string]string{
-						"crd.custom.local/v1alpha1": redisCluster.Name,
+						"crd.custom.local/v1alpha1": redis.Name,
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:            "rediscluster", //现在是硬编码
-							Image:           redisCluster.Spec.Image,
+							Name:            "redis", //现在是硬编码
+							Image:           redis.Spec.Image,
 							ImagePullPolicy: corev1.PullIfNotPresent,
-							Resources:       redisCluster.Spec.Resources,
+							Resources:       redis.Spec.Resources,
 							//redis里port有多个，6379用于服务监听, 用于集群通信的16379
 							Ports: []corev1.ContainerPort{
 								{Name: "redis", ContainerPort: 6379,},
@@ -118,7 +118,7 @@ func New(redisCluster *v1alpha1.Redis) *appsv1.StatefulSet {
 									},
 									DefaultMode: &configMapMode,
 									LocalObjectReference: corev1.LocalObjectReference{
-										Name: redisCluster.Name,
+										Name: redis.Name,
 									},
 								},
 							},
@@ -136,12 +136,12 @@ func New(redisCluster *v1alpha1.Redis) *appsv1.StatefulSet {
 						},
 						Spec:corev1.PersistentVolumeClaimSpec{
 							AccessModes:[]corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
-							StorageClassName:&redisCluster.Spec.StorageClassName,
+							StorageClassName:&redis.Spec.StorageClassName,
 							Resources:corev1.ResourceRequirements{
 								Requests:corev1.ResourceList{
 									corev1.ResourceStorage:resource.MustParse(
 										//cr里定义的storage的格式需要是"5Gi"，string类型
-									redisCluster.Spec.Storage),
+										redis.Spec.Storage),
 								},
 							},
 						},

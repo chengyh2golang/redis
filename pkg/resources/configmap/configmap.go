@@ -38,23 +38,23 @@ var fixIPConfig = `#!/bin/sh
 `
 
 
-func New(redisCluster *v1alpha1.Redis) *corev1.ConfigMap {
+func New(redis *v1alpha1.Redis) *corev1.ConfigMap {
 	return &corev1.ConfigMap{
 		TypeMeta:metav1.TypeMeta{
 			Kind:       "ConfigMap",
 			APIVersion: "v1",
 		},
 		ObjectMeta:metav1.ObjectMeta{
-			Name:redisCluster.Name,
-			Namespace:redisCluster.Namespace,
+			Name:redis.Name,
+			Namespace:redis.Namespace,
 			OwnerReferences:[]metav1.OwnerReference{
-				*metav1.NewControllerRef(redisCluster,schema.GroupVersionKind{
+				*metav1.NewControllerRef(redis,schema.GroupVersionKind{
 					Group:v1alpha1.SchemeGroupVersion.Group,
 					Version:v1alpha1.SchemeGroupVersion.Version,
-					Kind:"RedisCluster",
+					Kind:"Redis",
 				}),
 			},
-			Labels:map[string]string{"crd.custom.local": redisCluster.Name},
+			Labels:map[string]string{"crd.custom.local": redis.Name},
 		},
 		Data: map[string]string{
 			RedisConfigKey:redisConfig,
