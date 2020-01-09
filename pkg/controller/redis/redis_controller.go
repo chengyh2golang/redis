@@ -15,13 +15,13 @@ import (
 	"strings"
 	"time"
 
-	crdv1alpha1 "redis/pkg/apis/crd/v1alpha1"
 	"github.com/ericchiang/k8s"
 	simplecorev1 "github.com/ericchiang/k8s/apis/core/v1"
+	crdv1alpha1 "redis/pkg/apis/crd/v1alpha1"
 
-	"k8s.io/apimachinery/pkg/api/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
