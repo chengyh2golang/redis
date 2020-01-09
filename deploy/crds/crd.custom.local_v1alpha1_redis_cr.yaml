@@ -1,7 +1,7 @@
 apiVersion: crd.custom.local/v1alpha1
 kind: Redis
 metadata:
-  name: example-redis
+  name: redis
 spec:
   # Add fields here
   replicas: 6
