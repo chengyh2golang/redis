@@ -16,11 +16,53 @@ const (
 
 var redisConfig = `cluster-enabled yes
 cluster-config-file /data/nodes.conf
-cluster-node-timeout 5000
-cluster-migration-barrier 1
-dir /data
-appendonly yes
+cluster-node-timeout 10000
 protected-mode no
+daemonize no
+pidfile /var/run/redis.pid
+port 6379
+tcp-backlog 511
+bind 0.0.0.0
+timeout 3600
+tcp-keepalive 1
+loglevel verbose
+logfile /data/redis.log
+databases 16
+save 900 1
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+dir /data
+#requirepass yl123456
+appendonly yes
+appendfilename "appendonly.aof"
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+lua-time-limit 20000
+slowlog-log-slower-than 10000
+slowlog-max-len 128
+#rename-command FLUSHALL  ""
+latency-monitor-threshold 0
+notify-keyspace-events ""
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-entries 512
+list-max-ziplist-value 64
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+activerehashing yes
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit slave 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+hz 10
+aof-rewrite-incremental-fsync yes
 `
 
 
