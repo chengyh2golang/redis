@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
+  name: redis-operator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: redis
+      name: redis-operator
   template:
     metadata:
       labels:
-        name: redis
+        name: redis-operator
     spec:
       serviceAccountName: redis
       containers:
-        - name: redis
+        - name: redis-operator
           # Replace this with the built image name
           image: redis-operator:1.0
           command:
