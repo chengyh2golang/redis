@@ -126,7 +126,7 @@ func main() {
 		}
 
 		//判断所有redis cluster的节点是否都已开始监听6379端口
-		envReady := checkRedisClusterNodeReady(clusterSizeInt, redisClusterName, ns)
+		redisMap,envReady := checkRedisClusterNodeReady(clusterSizeInt, redisClusterName, ns)
 
 		//如果集群节点redis服务都已经启动正常
 		//准备使用reids-trib来初始化集群
@@ -162,7 +162,7 @@ func main() {
 			}()
 
 			//把redis-trib命令的字符串构建出来
-			redisTribCommand := redisTribCreateScript(clusterSizeInt, redisClusterName, ns)
+			redisTribCommand := redisTribCreateScript(clusterSizeInt, redisMap)
 
 			//用构建出来的正确执行命令去替换掉expectScriptTemplate模板中的exec_command_template
 			execScript := strings.ReplaceAll(expectScriptTemplate, "exec_command_template", redisTribCommand)
@@ -203,7 +203,7 @@ func main() {
 		}
 
 		//判断所有redis cluster的节点是否都已开始监听6379端口
-		envReady := checkRedisClusterNodeReady(checkSize, redisClusterName, ns)
+		_,envReady := checkRedisClusterNodeReady(checkSize, redisClusterName, ns)
 
 		//如果集群节点redis服务都已经启动正常
 		//准备使用reids-trib来初始化集群
@@ -523,10 +523,17 @@ func redisTribAddScript(oldClusterSizeInt,newClusterSizeInt int,
 //fullname: rediscluster01-0.rediscluster01.default.svc.cluster.local
 //构造一个类似于这样的脚本：
 // redis-trib create --replicas 1 172.16.73.157:6379 172.16.73.166:6379 172.16.73.169:6379 172.16.73.157:6379 172.16.73.166:6379 172.16.73.169:6379
-func redisTribCreateScript(clusterSize int,redisClusterName string,ns string) string {
+func redisTribCreateScript(clusterSize int, redisMap map[string]string ) string {
 	var resultSlice []string
 	resultSlice = append(resultSlice,"redis-trib.rb ","create ","--replicas 1 ")
 
+	if clusterSize == len(redisMap) {
+		for k := range redisMap {
+			resultSlice = append(resultSlice,k)
+		}
+	}
+
+	/*
 	for i:=0; i< clusterSize;i++ {
 		itemFullname := redisClusterName + "-" + strconv.Itoa(i) + "." +
 			redisClusterName + "." + ns + ".svc.cluster.local"
@@ -539,6 +546,8 @@ func redisTribCreateScript(clusterSize int,redisClusterName string,ns string) st
 		item := fmt.Sprintf("%v:6379 ",formatItemIP)
 		resultSlice = append(resultSlice,item)
 	}
+
+	 */
 
 	//轮询这个slice，把所有元素拼接成整个字符串，并返回
 	result := ""
@@ -609,7 +618,7 @@ func fetchIPByFullName (fullName string) (string,error) {
 
 //检查环境是否就绪
 //检查所有目标redis节点的6379端口都已开始监听
-func checkRedisClusterNodeReady(clusterSizeInt int,redisClusterName,ns string) bool {
+func checkRedisClusterNodeReady(clusterSizeInt int,redisClusterName,ns string) (map[string]string,bool) {
 	var readyNode = map[string]string{}
 	for ! (len(readyNode) == clusterSizeInt)  {
 		time.Sleep(time.Second *1)
@@ -638,7 +647,7 @@ func checkRedisClusterNodeReady(clusterSizeInt int,redisClusterName,ns string) b
 			log.Printf("已经就绪的节点个数：%v, 就绪的节点: %v",len(readyNode),readyNode)
 		}
 	}
-	return true
+	return readyNode,true
 }
 
 //检查端口是否监听
