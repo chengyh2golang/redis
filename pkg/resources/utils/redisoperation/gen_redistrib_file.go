@@ -529,7 +529,8 @@ func redisTribCreateScript(clusterSize int, redisMap map[string]string ) string 
 
 	if clusterSize == len(redisMap) {
 		for k := range redisMap {
-			resultSlice = append(resultSlice,k)
+			item := k + " "
+			resultSlice = append(resultSlice,item)
 		}
 	}
 
